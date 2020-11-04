@@ -116,6 +116,26 @@ class RemoteFeedLoaderTests: XCTestCase {
         })
     }
 
+    func test_load_succeedsOn200HTTPResponseWithEmptyJSONList() {
+        let (sut, client) = makeSUT()
+        let data = makeJSONData(from: [])
+
+        let exp = expectation(description: "Wait load to complete")
+        var capturedResult: [FeedItem]?
+        sut.load { result in
+            switch (result) {
+            case let .success(items):
+                capturedResult = items
+            case .failure:
+                XCTFail("Expected success, got \(result) instead", file: #filePath, line: #line)
+            }
+            exp.fulfill()
+        }
+        client.completeWith(statusCode: 200, data: data)
+        wait(for: [exp], timeout: 1.0)
+        XCTAssertEqual(capturedResult, [])
+    }
+
     func test_load_succeedsOn200HTTPResponse() {
         let (sut, client) = makeSUT()
         let (item1, json1) = makeItem(
