@@ -10,7 +10,7 @@ import Foundation
 
 class RemoteFeedLoader {
     func load() {
-        HTTPClient.shared.requestedURL = URL(string: "http://a-given-url.com")!
+        HTTPClient.shared.get(from: URL(string: "http://a-given-url.com")!)
     }
 }
 
@@ -21,6 +21,10 @@ class HTTPClient {
     private init() {}
 
     var requestedURL: URL?
+
+    func get(from url: URL) {
+        requestedURL = url
+    }
 }
 
 class RemoteFeedLoaderTests: XCTestCase {
