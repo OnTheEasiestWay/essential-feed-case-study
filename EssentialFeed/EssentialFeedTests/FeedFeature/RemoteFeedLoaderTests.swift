@@ -90,18 +90,20 @@ class RemoteFeedLoaderTests: XCTestCase {
     func test_load_failsOnNon200HTTPResponse() {
         let url = URL(string: "http://a-url.com")!
         let (sut, client) = makeSUT(url: url)
-        let statusCode = 400
+        let invalidCodes = [199, 201, 300, 400, 500]
 
-        let exp = expectation(description: "Wait load to complete")
-        var capturedError: RemoteFeedLoader.Error?
-        sut.load() { error in
-            capturedError = error
-            exp.fulfill()
+        invalidCodes.enumerated().forEach { index, code in
+            let exp = expectation(description: "Wait load to complete")
+            var capturedError: RemoteFeedLoader.Error?
+            sut.load() { error in
+                capturedError = error
+                exp.fulfill()
+            }
+            client.complete(with: code, at: index)
+            wait(for: [exp], timeout: 1.0)
+
+            XCTAssertEqual(capturedError, .invalidData)
         }
-        client.complete(with: statusCode)
-        wait(for: [exp], timeout: 1.0)
-
-        XCTAssertEqual(capturedError, .invalidData)
     }
 
     // MARK: -- Helpers
