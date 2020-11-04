@@ -25,7 +25,7 @@ class RemoteFeedLoader {
     func load(completion: @escaping (Error) -> Void) {
         client.get(from: url) { result in
             switch (result) {
-            case let .success(data, response):
+            case .success:
                 completion(.invalidData)
 
             case .failure:
