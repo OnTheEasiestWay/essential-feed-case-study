@@ -107,7 +107,7 @@ class RemoteFeedLoaderTests: XCTestCase {
         }
     }
 
-    func test_load_failsOn200HTTPResponseAndInvalidData() {
+    func test_load_failsOn200HTTPResponseWithInvalidData() {
         let (sut, client) = makeSUT()
 
         expect(sut, with: .invalidData, when: {
@@ -136,7 +136,7 @@ class RemoteFeedLoaderTests: XCTestCase {
         XCTAssertEqual(capturedResult, [])
     }
 
-    func test_load_succeedsOn200HTTPResponse() {
+    func test_load_succeedsOn200HTTPResponseWithJSONList() {
         let (sut, client) = makeSUT()
         let (item1, json1) = makeItem(
                 id: UUID(),
