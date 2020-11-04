@@ -75,16 +75,9 @@ class RemoteFeedLoaderTests: XCTestCase {
         let (sut, client) = makeSUT(url: url)
         let error = NSError(domain: "HTTPClient Error", code: -1)
 
-        let exp = expectation(description: "Wait load to complete")
-        var capturedError: RemoteFeedLoader.Error?
-        sut.load() { error in
-            capturedError = error
-            exp.fulfill()
-        }
-        client.complete(with: error)
-        wait(for: [exp], timeout: 1.0)
-
-        XCTAssertEqual(capturedError, .connectivity)
+        expect(sut, with: .connectivity, when: {
+            client.complete(with: error)
+        })
     }
 
     func test_load_failsOnNon200HTTPResponse() {
@@ -93,16 +86,9 @@ class RemoteFeedLoaderTests: XCTestCase {
         let invalidCodes = [199, 201, 300, 400, 500]
 
         invalidCodes.enumerated().forEach { index, code in
-            let exp = expectation(description: "Wait load to complete")
-            var capturedError: RemoteFeedLoader.Error?
-            sut.load() { error in
-                capturedError = error
-                exp.fulfill()
-            }
-            client.complete(with: code, at: index)
-            wait(for: [exp], timeout: 1.0)
-
-            XCTAssertEqual(capturedError, .invalidData)
+            expect(sut, with: .invalidData, when: {
+                client.complete(with: code, at: index)
+            })
         }
     }
 
@@ -112,6 +98,21 @@ class RemoteFeedLoaderTests: XCTestCase {
         let client = HTTPClientSpy()
         let sut = RemoteFeedLoader(url: url, client: client)
         return (sut: sut, client: client)
+    }
+
+    private func expect(_ sut: RemoteFeedLoader, with error: RemoteFeedLoader.Error, when action: () -> Void) {
+        let exp = expectation(description: "Wait load to complete")
+        var capturedError: RemoteFeedLoader.Error?
+        sut.load() { error in
+            capturedError = error
+            exp.fulfill()
+        }
+
+        action()
+
+        wait(for: [exp], timeout: 1.0)
+
+        XCTAssertEqual(capturedError, error)
     }
 
     private class HTTPClientSpy: HTTPClient {
