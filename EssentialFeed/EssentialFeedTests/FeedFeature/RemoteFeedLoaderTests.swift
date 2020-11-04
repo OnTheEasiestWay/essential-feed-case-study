@@ -87,8 +87,7 @@ class RemoteFeedLoaderTests: XCTestCase {
     }
 
     func test_load_failsOnHTTPClientError() {
-        let url = URL(string: "http://a-wrong-url.com")!
-        let (sut, client) = makeSUT(url: url)
+        let (sut, client) = makeSUT()
         let error = NSError(domain: "HTTPClient Error", code: -1)
 
         expect(sut, with: .connectivity, when: {
@@ -97,8 +96,7 @@ class RemoteFeedLoaderTests: XCTestCase {
     }
 
     func test_load_failsOnNon200HTTPResponse() {
-        let url = URL(string: "http://a-url.com")!
-        let (sut, client) = makeSUT(url: url)
+        let (sut, client) = makeSUT()
         let invalidCodes = [199, 201, 300, 400, 500]
 
         invalidCodes.enumerated().forEach { index, code in
@@ -110,8 +108,7 @@ class RemoteFeedLoaderTests: XCTestCase {
     }
 
     func test_load_succeedsOn200HTTPResponse() {
-        let url = URL(string: "http://a-url.com")!
-        let (sut, client) = makeSUT(url: url)
+        let (sut, client) = makeSUT()
         let (item1, json1) = makeItem(
                 id: UUID(),
                 imageURL: URL(string: "http://image-url1.com")!)
