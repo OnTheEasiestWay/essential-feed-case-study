@@ -92,7 +92,7 @@ class RemoteFeedLoaderTests: XCTestCase {
         let error = NSError(domain: "HTTPClient Error", code: -1)
 
         expect(sut, with: .connectivity, when: {
-            client.complete(with: error)
+            client.completeWith(error: error)
         })
     }
 
@@ -103,7 +103,8 @@ class RemoteFeedLoaderTests: XCTestCase {
 
         invalidCodes.enumerated().forEach { index, code in
             expect(sut, with: .invalidData, when: {
-                client.complete(with: code, at: index)
+                let data = Data("any data".utf8)
+                client.completeWith(statusCode: code, data: data, at: index)
             })
         }
     }
@@ -121,10 +122,6 @@ class RemoteFeedLoaderTests: XCTestCase {
                 imageURL: URL(string: "http:/image-url2.com")!)
 
         let data = makeJSONData(from: [json1, json2])
-        let response = HTTPURLResponse(url: url,
-                statusCode: 200,
-                httpVersion: nil,
-                headerFields: nil)!
 
         let exp = expectation(description: "Wait load to complete")
         var capturedResult: [FeedItem]?
@@ -137,7 +134,7 @@ class RemoteFeedLoaderTests: XCTestCase {
             }
             exp.fulfill()
         }
-        client.complete(with: (data: data, response: response))
+        client.completeWith(statusCode: 200, data: data)
         wait(for: [exp], timeout: 1.0)
         XCTAssertEqual(capturedResult, [item1, item2])
     }
@@ -202,21 +199,16 @@ class RemoteFeedLoaderTests: XCTestCase {
             messages.append((url, completion))
         }
 
-        func complete(with error: NSError, at index: Int = 0) {
+        func completeWith(error: NSError, at index: Int = 0) {
             messages[index].completion(.failure(error));
         }
 
-        func complete(with statusCode: Int, at index: Int = 0) {
-            let data = Data("any data".utf8)
+        func completeWith(statusCode: Int, data: Data, at index: Int = 0) {
             let response = HTTPURLResponse(url: requestedURLs[index],
                     statusCode: statusCode,
                     httpVersion: nil,
                     headerFields: nil)!
             messages[index].completion(.success(data, response));
-        }
-
-        func complete(with success: (data: Data, response: URLResponse), at index: Int = 0) {
-            messages[index].completion(.success(success.data, success.response))
         }
     }
 }
