@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2B8D6C562C4AE719AB0CD279 /* RemoteFeedItemMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B8D63820F1D6699B7C52276 /* RemoteFeedItemMapper.swift */; };
 		B904BA452551A6C900FAFA5C /* EssentialFeed.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B904BA3B2551A6C900FAFA5C /* EssentialFeed.framework */; };
 		B904BA5D2551A77300FAFA5C /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B904BA5C2551A77300FAFA5C /* FeedItem.swift */; };
 		B904BA612551A86300FAFA5C /* FeedLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B904BA602551A86300FAFA5C /* FeedLoader.swift */; };
@@ -26,6 +27,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2B8D63820F1D6699B7C52276 /* RemoteFeedItemMapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteFeedItemMapper.swift; sourceTree = "<group>"; };
 		B904BA3B2551A6C900FAFA5C /* EssentialFeed.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EssentialFeed.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B904BA3F2551A6C900FAFA5C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B904BA442551A6C900FAFA5C /* EssentialFeedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EssentialFeedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -98,6 +100,7 @@
 				B904BA5C2551A77300FAFA5C /* FeedItem.swift */,
 				B904BA602551A86300FAFA5C /* FeedLoader.swift */,
 				B904BA9C255322D500FAFA5C /* HTTPClient.swift */,
+				2B8D63820F1D6699B7C52276 /* RemoteFeedItemMapper.swift */,
 				B904BAA02553230C00FAFA5C /* RemoteFeedLoader.swift */,
 			);
 			path = FeedFeature;
@@ -224,6 +227,7 @@
 				B904BA612551A86300FAFA5C /* FeedLoader.swift in Sources */,
 				B904BA5D2551A77300FAFA5C /* FeedItem.swift in Sources */,
 				B904BA9D255322D500FAFA5C /* HTTPClient.swift in Sources */,
+				2B8D6C562C4AE719AB0CD279 /* RemoteFeedItemMapper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
