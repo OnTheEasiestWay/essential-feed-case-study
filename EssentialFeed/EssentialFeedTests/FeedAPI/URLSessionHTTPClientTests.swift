@@ -45,7 +45,7 @@ class URLSessionHTTPClientTests: XCTestCase {
         let url = anyURL()
 
         let exp = expectation(description: "Wait get to complete")
-        URLProtocolStub.observer = { request in
+        URLProtocolStub.observeRequest { request in
             XCTAssertEqual(request.url, url)
             XCTAssertEqual(request.httpMethod, "GET")
             exp.fulfill()
@@ -159,27 +159,45 @@ class URLSessionHTTPClientTests: XCTestCase {
         }
     }
 
-    class URLProtocolStub: URLProtocol {
-        static var observer: ((URLRequest) -> Void)?
-
-        struct Stub {
+    private class URLProtocolStub: URLProtocol {
+        private struct Stub {
             let data: Data?
             let response: URLResponse?
             let error: Error?
-        }
-        static var stub: Stub?
-
-        class func stub(data: Data?, response: URLResponse?, error: Error?) {
-            URLProtocolStub.stub = Stub(data: data, response: response, error:error)
+            let requestObserver: ((URLRequest) -> Void)?
         }
 
-        class func startInterceptingRequest() {
+        private static var _stub: Stub?
+
+        private static let queue = DispatchQueue(label: "URLProtocolStub.queue")
+        private static var stub: Stub? {
+            get {
+                queue.sync {
+                    _stub
+                }
+            }
+
+            set {
+                queue.sync {
+                    _stub = newValue
+                }
+            }
+        }
+
+        static func stub(data: Data?, response: URLResponse?, error: Error?) {
+            URLProtocolStub.stub = Stub(data: data, response: response, error:error, requestObserver: nil)
+        }
+
+        static func observeRequest(observer: @escaping (URLRequest) -> Void) {
+            URLProtocolStub.stub = Stub(data: nil, response: nil, error: nil, requestObserver: observer)
+        }
+
+        static func startInterceptingRequest() {
             URLProtocol.registerClass(URLProtocolStub.self)
         }
 
-        class func stopInterceptingRequest() {
+        static func stopInterceptingRequest() {
             URLProtocol.unregisterClass(URLProtocolStub.self)
-            URLProtocolStub.observer = nil
             URLProtocolStub.stub = nil
         }
 
@@ -192,22 +210,24 @@ class URLSessionHTTPClientTests: XCTestCase {
         }
 
         override func startLoading() {
-            if let response = URLProtocolStub.stub?.response {
+            guard let stub = URLProtocolStub.stub else { return }
+
+            if let response = stub.response {
                 client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
             }
 
-            if let data = URLProtocolStub.stub?.data {
+            if let data = stub.data {
                 client?.urlProtocol(self, didLoad: data)
             }
 
-            if let error = URLProtocolStub.stub?.error {
+            if let error = stub.error {
                 client?.urlProtocol(self, didFailWithError: error)
             } else {
                 client?.urlProtocolDidFinishLoading(self)
             }
 
-            if let observer = URLProtocolStub.observer {
-                observer(self.request)
+            if let requestObserver = stub.requestObserver {
+                requestObserver(self.request)
             }
         }
 
