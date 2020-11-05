@@ -53,7 +53,7 @@ class URLSessionHTTPClientTests: XCTestCase {
         wait(for: [exp], timeout: 1.0)
     }
 
-    func test_get_diliversErrorWithURLSessionError() {
+    func test_get_deliversErrorWithURLSessionError() {
         let expectedError = NSError(domain: "URLSession Error", code: -1)
         URLProtocolStub.stub(data: nil, response: nil, error: expectedError)
 
@@ -72,7 +72,7 @@ class URLSessionHTTPClientTests: XCTestCase {
         wait(for: [exp], timeout: 1.0)
     }
 
-    func test_get_diliversErrorWithURLSessionAllNilValues() {
+    func test_get_deliversErrorWithURLSessionAllNilValues() {
         URLProtocolStub.stub(data: nil, response: nil, error: nil)
 
         let exp = expectation(description: "Wait get to complete")
