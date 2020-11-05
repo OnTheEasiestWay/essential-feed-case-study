@@ -101,12 +101,6 @@ class URLSessionHTTPClientTests: XCTestCase {
         return sut
     }
 
-    private func trackMemoryLeak(_ instance: AnyObject, file: StaticString = #filePath, line: UInt = #line) {
-        addTeardownBlock { [weak instance] in
-            XCTAssertNil(instance, "Instance should be nil, potential memory leak", file: file, line: line)
-        }
-    }
-
     private func anyURL() -> URL {
         return URL(string: "http://any-url.com")!
     }
