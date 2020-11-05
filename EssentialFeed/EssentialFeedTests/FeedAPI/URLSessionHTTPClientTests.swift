@@ -6,6 +6,7 @@
 //
 
 import XCTest
+import EssentialFeed
 
 class URLSessionHTTPClient {
     private let session: URLSession
@@ -14,9 +15,11 @@ class URLSessionHTTPClient {
         self.session = session
     }
 
-    func get(from url: URL) {
-        session.dataTask(with: url) { _, _, _ in
-
+    func get(from url: URL, completion: @escaping (HTTPClientResult) -> Void) {
+        session.dataTask(with: url) { _, _, error in
+            if let error = error {
+                completion(.failure(error))
+            }
         }.resume()
     }
 }
@@ -35,7 +38,32 @@ class URLSessionHTTPClientTests: XCTestCase {
             exp.fulfill()
         }
 
-        sut.get(from: url)
+        sut.get(from: url) { _ in }
+        wait(for: [exp], timeout: 1.0)
+
+        URLProtocol.unregisterClass(URLProtocolStub.self)
+    }
+
+    func test_get_diliversErrorWithURLSessionError() {
+        URLProtocol.registerClass(URLProtocolStub.self)
+
+        let url = URL(string: "http://any-url.com")!
+        let sut = URLSessionHTTPClient()
+        let expectedError = NSError(domain: "URLSession Error", code: -1)
+        URLProtocolStub.stub(error: expectedError)
+
+        let exp = expectation(description: "Wait get to complete")
+        sut.get(from: url) { result in
+            switch result {
+            case let .failure(capturedError as NSError):
+                XCTAssertEqual(capturedError, expectedError)
+            default:
+                XCTFail("Expect to get failure, got \(result) instead")
+            }
+
+            exp.fulfill()
+        }
+
         wait(for: [exp], timeout: 1.0)
 
         URLProtocol.unregisterClass(URLProtocolStub.self)
@@ -45,6 +73,11 @@ class URLSessionHTTPClientTests: XCTestCase {
 
     class URLProtocolStub: URLProtocol {
         static var observer: ((URLRequest) -> Void)?
+        static var error: Error?
+
+        class func stub(error: Error?) {
+            URLProtocolStub.error = error
+        }
 
         override class func canInit(with task: URLSessionTask) -> Bool {
             true
@@ -55,7 +88,11 @@ class URLSessionHTTPClientTests: XCTestCase {
         }
 
         override func startLoading() {
-            client?.urlProtocolDidFinishLoading(self)
+            if let error = URLProtocolStub.error {
+                client?.urlProtocol(self, didFailWithError: error)
+            } else {
+                client?.urlProtocolDidFinishLoading(self)
+            }
 
             if let observer = URLProtocolStub.observer {
                 observer(self.request)
