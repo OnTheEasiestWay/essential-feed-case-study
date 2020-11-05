@@ -28,8 +28,7 @@ class URLSessionHTTPClientTests: XCTestCase {
     func test_get_requestsDataFromURL() {
         URLProtocol.registerClass(URLProtocolStub.self)
 
-        let url = URL(string: "http://any-url.com")!
-        let sut = URLSessionHTTPClient()
+        let url = anyURL()
 
         let exp = expectation(description: "Wait get to complete")
         URLProtocolStub.observer = { request in
@@ -38,7 +37,7 @@ class URLSessionHTTPClientTests: XCTestCase {
             exp.fulfill()
         }
 
-        sut.get(from: url) { _ in }
+        makeSUT().get(from: url) { _ in }
         wait(for: [exp], timeout: 1.0)
 
         URLProtocol.unregisterClass(URLProtocolStub.self)
@@ -47,13 +46,11 @@ class URLSessionHTTPClientTests: XCTestCase {
     func test_get_diliversErrorWithURLSessionError() {
         URLProtocol.registerClass(URLProtocolStub.self)
 
-        let url = URL(string: "http://any-url.com")!
-        let sut = URLSessionHTTPClient()
         let expectedError = NSError(domain: "URLSession Error", code: -1)
         URLProtocolStub.stub(error: expectedError)
 
         let exp = expectation(description: "Wait get to complete")
-        sut.get(from: url) { result in
+        makeSUT().get(from: anyURL()) { result in
             switch result {
             case let .failure(capturedError as NSError):
                 XCTAssertEqual(capturedError, expectedError)
@@ -70,6 +67,14 @@ class URLSessionHTTPClientTests: XCTestCase {
     }
 
     // MARK: -- Helpers
+
+    private func makeSUT() -> URLSessionHTTPClient {
+        return URLSessionHTTPClient()
+    }
+
+    private func anyURL() -> URL {
+        return URL(string: "http://any-url.com")!
+    }
 
     class URLProtocolStub: URLProtocol {
         static var observer: ((URLRequest) -> Void)?
