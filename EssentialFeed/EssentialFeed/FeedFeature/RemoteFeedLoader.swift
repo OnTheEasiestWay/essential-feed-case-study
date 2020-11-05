@@ -16,15 +16,12 @@ public class RemoteFeedLoader {
         self.client = client
     }
 
-    public enum Error {
+    public enum Error: Swift.Error {
         case connectivity
         case invalidData
     }
 
-    public enum Result {
-        case success([FeedItem])
-        case failure(Error)
-    }
+    public typealias Result = FeedLoaderResult
 
     public func load(completion: @escaping (Result) -> Void) {
         client.get(from: url) { [weak self] result in
@@ -35,7 +32,7 @@ public class RemoteFeedLoader {
                 completion(RemoteFeedItemMapper.map(data: data, response: response))
 
             case .failure:
-                completion(.failure(.connectivity))
+                completion(.failure(Error.connectivity))
             }
         }
     }
