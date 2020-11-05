@@ -19,13 +19,6 @@ class RemoteFeedItemMapper {
         let location: String?
         let image: URL
 
-        init(id: UUID, description: String?, location: String?, image: URL) {
-            self.id = id
-            self.description = description
-            self.location = location
-            self.image = image
-        }
-
         var item: FeedItem {
             FeedItem(id: id, description: description, location: location, imageURL: image)
         }
