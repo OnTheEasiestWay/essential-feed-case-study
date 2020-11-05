@@ -39,7 +39,7 @@ class RemoteFeedLoaderTests: XCTestCase {
         let (sut, client) = makeSUT()
         let error = NSError(domain: "HTTPClient Error", code: -1)
 
-        expect(sut, with: .failure(RemoteFeedLoader.Error.connectivity), when: {
+        expect(sut, with: failure(.connectivity), when: {
             client.completeWith(error: error)
         })
     }
@@ -49,7 +49,7 @@ class RemoteFeedLoaderTests: XCTestCase {
         let invalidCodes = [199, 201, 300, 400, 500]
 
         invalidCodes.enumerated().forEach { index, code in
-            expect(sut, with: .failure(RemoteFeedLoader.Error.invalidData), when: {
+            expect(sut, with: failure(.invalidData), when: {
                 let data = Data("any data".utf8)
                 client.completeWith(statusCode: code, data: data, at: index)
             })
@@ -59,7 +59,7 @@ class RemoteFeedLoaderTests: XCTestCase {
     func test_load_failsOn200HTTPResponseWithInvalidData() {
         let (sut, client) = makeSUT()
 
-        expect(sut, with: .failure(RemoteFeedLoader.Error.invalidData), when: {
+        expect(sut, with: failure(.invalidData), when: {
             let data = Data("invalid json".utf8)
             client.completeWith(statusCode: 200, data: data)
         })
@@ -115,6 +115,10 @@ class RemoteFeedLoaderTests: XCTestCase {
         trackMemoryLeak(sut, file: file, line: line)
 
         return (sut: sut, client: client)
+    }
+
+    private func failure(_ error: RemoteFeedLoader.Error) -> RemoteFeedLoader.Result {
+        .failure(error)
     }
 
     private func trackMemoryLeak(_ instance: AnyObject, file: StaticString = #filePath, line: UInt = #line) {
