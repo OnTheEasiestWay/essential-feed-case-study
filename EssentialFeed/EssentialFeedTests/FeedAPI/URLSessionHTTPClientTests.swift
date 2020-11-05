@@ -25,9 +25,17 @@ class URLSessionHTTPClient {
 }
 
 class URLSessionHTTPClientTests: XCTestCase {
-    func test_get_requestsDataFromURL() {
-        URLProtocol.registerClass(URLProtocolStub.self)
+    override func setUp() {
+        super.setUp()
+        URLProtocolStub.startInterceptingRequest()
+    }
 
+    override func tearDown() {
+        URLProtocolStub.stopInterceptingRequest()
+        super.tearDown()
+    }
+
+    func test_get_requestsDataFromURL() {
         let url = anyURL()
 
         let exp = expectation(description: "Wait get to complete")
@@ -39,13 +47,9 @@ class URLSessionHTTPClientTests: XCTestCase {
 
         makeSUT().get(from: url) { _ in }
         wait(for: [exp], timeout: 1.0)
-
-        URLProtocol.unregisterClass(URLProtocolStub.self)
     }
 
     func test_get_diliversErrorWithURLSessionError() {
-        URLProtocol.registerClass(URLProtocolStub.self)
-
         let expectedError = NSError(domain: "URLSession Error", code: -1)
         URLProtocolStub.stub(error: expectedError)
 
@@ -62,8 +66,6 @@ class URLSessionHTTPClientTests: XCTestCase {
         }
 
         wait(for: [exp], timeout: 1.0)
-
-        URLProtocol.unregisterClass(URLProtocolStub.self)
     }
 
     // MARK: -- Helpers
@@ -82,6 +84,16 @@ class URLSessionHTTPClientTests: XCTestCase {
 
         class func stub(error: Error?) {
             URLProtocolStub.error = error
+        }
+
+        class func startInterceptingRequest() {
+            URLProtocol.registerClass(URLProtocolStub.self)
+        }
+
+        class func stopInterceptingRequest() {
+            URLProtocol.unregisterClass(URLProtocolStub.self)
+            URLProtocolStub.observer = nil
+            URLProtocolStub.error = nil
         }
 
         override class func canInit(with task: URLSessionTask) -> Bool {
