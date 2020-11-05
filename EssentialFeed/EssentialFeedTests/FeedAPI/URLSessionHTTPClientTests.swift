@@ -59,8 +59,17 @@ class URLSessionHTTPClientTests: XCTestCase {
         XCTAssertEqual(receivedError as NSError?, expectedError)
     }
 
-    func test_get_deliversErrorWithURLSessionAllNilValues() {
+    func test_get_deliversErrorWithURLSessionAllInvalidRepresentations() {
         XCTAssertNotNil(expectErrorFor(data: nil, response: nil, error: nil))
+        XCTAssertNotNil(expectErrorFor(data: nil, response: anyURLResponse(), error: nil))
+        XCTAssertNotNil(expectErrorFor(data: nil, response: anyHTTPURLResponse(), error: nil))
+        XCTAssertNotNil(expectErrorFor(data: anyData(), response: nil, error: nil))
+        XCTAssertNotNil(expectErrorFor(data: anyData(), response: nil, error: anyNSError()))
+        XCTAssertNotNil(expectErrorFor(data: nil, response: anyURLResponse(), error: anyNSError()))
+        XCTAssertNotNil(expectErrorFor(data: nil, response: anyHTTPURLResponse(), error: anyNSError()))
+        XCTAssertNotNil(expectErrorFor(data: anyData(), response: anyURLResponse(), error: anyNSError()))
+        XCTAssertNotNil(expectErrorFor(data: anyData(), response: anyHTTPURLResponse(), error: anyNSError()))
+        XCTAssertNotNil(expectErrorFor(data: anyData(), response: anyURLResponse(), error: nil))
     }
 
     // MARK: -- Helpers
@@ -71,6 +80,22 @@ class URLSessionHTTPClientTests: XCTestCase {
 
     private func anyURL() -> URL {
         return URL(string: "http://any-url.com")!
+    }
+
+    private func anyData() -> Data {
+        return Data("any data".utf8)
+    }
+
+    private func anyNSError() -> NSError {
+        return NSError(domain: "URLSession Error", code: -1)
+    }
+
+    private func anyURLResponse() -> URLResponse {
+        return URLResponse(url: anyURL(), mimeType: nil, expectedContentLength: 0, textEncodingName: nil)
+    }
+
+    private func anyHTTPURLResponse() -> HTTPURLResponse {
+        return HTTPURLResponse(url: anyURL(), statusCode: 200, httpVersion: nil, headerFields: nil)!
     }
 
     private func expectErrorFor(data: Data?, response: URLResponse?, error: Error?, file: StaticString = #filePath, line: UInt = #line) -> Error? {
