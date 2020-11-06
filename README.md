@@ -98,7 +98,11 @@ Then the app should display an error message
 
 ## Architecture
 
+### Architecture Module
 ![Feed Loading Feature](feed_architecture.png)
+
+### Architecture Module Development
+![Feed Loading Feature Development](feed_architecture_development.png)
 
 ## Model Specs
 
