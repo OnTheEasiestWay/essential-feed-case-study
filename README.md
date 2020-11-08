@@ -1,5 +1,7 @@
 # Essential Feed App – Image Feed Feature
 
+[![Build Status](https://travis-ci.com/OnTheEasiestWay/essential-feed-case-study.svg?branch=master)](https://travis-ci.com/OnTheEasiestWay/essential-feed-case-study)
+
 ## BDD Specs
 
 ### Story: Customer requests to see their image feed
@@ -96,7 +98,11 @@ Then the app should display an error message
 
 ## Architecture
 
+### Architecture Module
 ![Feed Loading Feature](feed_architecture.png)
+
+### Architecture Module Development
+![Feed Loading Feature Development](feed_architecture_development.png)
 
 ## Model Specs
 
